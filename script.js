@@ -90,4 +90,14 @@ const renderMovements = function (movements) {
   });
 };
 
+function createUsername(arr) {
+  arr.forEach((el) => {
+    const toLowerArr = el.owner.toLowerCase().split(" ");
+    el.username = toLowerArr.map((el) => el[0]).join("");
+  });
+}
+
+createUsername(accounts);
+console.log(accounts);
+
 renderMovements(movements);
