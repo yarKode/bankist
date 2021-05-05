@@ -102,10 +102,36 @@ console.log(accounts);
 
 renderMovements(movements);
 
-const calAndDisplayBalance = function (arr) {
+const calcAndDisplayBalance = function (arr) {
   const balance = arr.reduce((acc, el) => acc + el, 0);
 
-  labelBalance.innerText = `${balance} EUR`;
+  labelBalance.innerText = `${balance} €`;
 };
 
-calAndDisplayBalance(account1.movements);
+calcAndDisplayBalance(account1.movements);
+
+const calcAndDisplaySum = function (arr) {
+  const income = arr.filter((el) => el > 0).reduce((acc, el) => acc + el, 0);
+
+  labelSumIn.innerText = `${income} €`;
+};
+
+const calcAndDisplayOut = function (arr) {
+  const outcome = arr.filter((el) => el < 0).reduce((acc, el) => acc + el, 0);
+
+  labelSumOut.innerText = `${Math.abs(outcome)} €`;
+};
+
+const calcAndDisplayInterest = (arr) => {
+  const interest = arr
+    .filter((el, i, arr) => el > 0)
+    .map((el) => (el * 1.2) / 100)
+    .filter((el) => el > 1)
+    .reduce((acc, el) => acc + el, 0);
+  console.log(interest);
+  labelSumInterest.innerText = `${interest} €`;
+};
+
+calcAndDisplaySum(account1.movements);
+calcAndDisplayOut(account1.movements);
+calcAndDisplayInterest(account1.movements);
