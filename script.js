@@ -101,3 +101,11 @@ createUsername(accounts);
 console.log(accounts);
 
 renderMovements(movements);
+
+const calAndDisplayBalance = function (arr) {
+  const balance = arr.reduce((acc, el) => acc + el, 0);
+
+  labelBalance.innerText = `${balance} EUR`;
+};
+
+calAndDisplayBalance(account1.movements);
