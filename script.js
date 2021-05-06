@@ -1,5 +1,3 @@
-"use strict";
-
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // BANKIST APP
@@ -100,15 +98,12 @@ function createUsername(arr) {
 createUsername(accounts);
 console.log(accounts);
 
-renderMovements(movements);
-
-const calcAndDisplayBalance = function (arr) {
-  const balance = arr.reduce((acc, el) => acc + el, 0);
+const calcAndDisplayBalance = function (acc) {
+  const balance = acc.movements.reduce((acc, el) => acc + el, 0);
+  acc.balance = balance;
 
   labelBalance.innerText = `${balance} €`;
 };
-
-calcAndDisplayBalance(account1.movements);
 
 const calcAndDisplaySum = function (arr) {
   const income = arr.filter((el) => el > 0).reduce((acc, el) => acc + el, 0);
@@ -122,16 +117,76 @@ const calcAndDisplayOut = function (arr) {
   labelSumOut.innerText = `${Math.abs(outcome)} €`;
 };
 
-const calcAndDisplayInterest = (arr) => {
+const calcAndDisplayInterest = ({ movements: arr, interestRate }) => {
   const interest = arr
     .filter((el, i, arr) => el > 0)
-    .map((el) => (el * 1.2) / 100)
+    .map((el) => (el * interestRate) / 100)
     .filter((el) => el > 1)
     .reduce((acc, el) => acc + el, 0);
   console.log(interest);
   labelSumInterest.innerText = `${interest} €`;
 };
 
-calcAndDisplaySum(account1.movements);
-calcAndDisplayOut(account1.movements);
-calcAndDisplayInterest(account1.movements);
+function updateUI(acc) {
+  renderMovements(acc.movements);
+  calcAndDisplayBalance(acc);
+  calcAndDisplaySum(acc.movements);
+  calcAndDisplayOut(acc.movements);
+  calcAndDisplayInterest(acc);
+}
+let currentAccount;
+
+btnLogin.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  currentAccount = accounts.find((acc) => {
+    return (
+      acc.username === inputLoginUsername.value &&
+      acc.pin === Number(inputLoginPin.value)
+    );
+  });
+
+  inputLoginUsername.value = inputLoginPin.value = "";
+
+  inputLoginPin.blur();
+
+  if (currentAccount) {
+    updateUI(currentAccount);
+    labelWelcome.innerText = `Welcome back, ${
+      currentAccount.owner.split(" ")[0]
+    }`;
+  } else {
+    labelWelcome.innerText = "Wrong credentials";
+  }
+});
+
+btnTransfer.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  const amount = Number(inputTransferAmount.value.trim());
+  const recepient = inputTransferTo.value.trim().toLowerCase();
+  if (
+    recepient &&
+    amount > 0 &&
+    amount <= currentAccount.balance &&
+    recepient !== currentAccount.username
+  ) {
+    const accReceiver = accounts.find((acc) => acc.username === recepient);
+
+    if (accReceiver) {
+      accReceiver.movements.push(amount);
+      currentAccount.movements.push(-amount);
+      updateUI(currentAccount);
+
+      inputTransferTo.innerText = "";
+      inputTransferAmount.innerText = "";
+      inputTransferAmount.blur();
+    } else {
+      console.log(`recepient is not found`);
+    }
+  } else {
+    console.log(
+      `Some of parameters in not valid: please check recepient is not empty, amount is not empty and is not bigger your balance ${recepient} ${amount} ${currentAccount.username}`
+    );
+  }
+});
