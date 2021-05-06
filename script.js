@@ -222,3 +222,19 @@ btnClose.addEventListener("click", (e) => {
     console.log(`Specified credentials are not correct`);
   }
 });
+
+btnLoan.addEventListener("click", (e) => {
+  e.preventDefault();
+  const loanAmount = Number(inputLoanAmount.value.trim());
+  if (
+    loanAmount > 0 &&
+    currentAccount.movements.some((mov) => mov / 0.1 > loanAmount)
+  ) {
+    currentAccount.movements.push(loanAmount);
+    inputLoanAmount.value = "";
+    inputLoanAmount.blur();
+    updateUI(currentAccount);
+  } else {
+    console.log(loanAmount);
+  }
+});
