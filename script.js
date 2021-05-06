@@ -128,11 +128,17 @@ const calcAndDisplayInterest = ({ movements: arr, interestRate }) => {
 };
 
 function updateUI(acc) {
-  renderMovements(acc.movements);
-  calcAndDisplayBalance(acc);
-  calcAndDisplaySum(acc.movements);
-  calcAndDisplayOut(acc.movements);
-  calcAndDisplayInterest(acc);
+  if (acc) {
+    renderMovements(acc.movements);
+    calcAndDisplayBalance(acc);
+    calcAndDisplaySum(acc.movements);
+    calcAndDisplayOut(acc.movements);
+    calcAndDisplayInterest(acc);
+  } else {
+    containerApp.style.opacity = 0;
+    labelWelcome.innerText = "Sign in to continue";
+    containerMovements.innerHtml = "";
+  }
 }
 let currentAccount;
 
@@ -151,6 +157,7 @@ btnLogin.addEventListener("click", (e) => {
   inputLoginPin.blur();
 
   if (currentAccount) {
+    containerApp.style.opacity = 100;
     updateUI(currentAccount);
     labelWelcome.innerText = `Welcome back, ${
       currentAccount.owner.split(" ")[0]
@@ -188,5 +195,30 @@ btnTransfer.addEventListener("click", (e) => {
     console.log(
       `Some of parameters in not valid: please check recepient is not empty, amount is not empty and is not bigger your balance ${recepient} ${amount} ${currentAccount.username}`
     );
+  }
+});
+
+btnClose.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  const specifiedUsername = inputCloseUsername.value.trim().toLowerCase();
+  const specifiedPin = Number(inputClosePin.value.trim().toLowerCase());
+
+  if (
+    specifiedUsername === currentAccount.username &&
+    specifiedPin === currentAccount.pin
+  ) {
+    const index = accounts.findIndex(
+      (acc) => acc.username === specifiedUsername
+    );
+
+    accounts.splice(index, 1);
+    currentAccount = null;
+
+    updateUI(currentAccount);
+
+    containerApp.style.opacity = 0;
+  } else {
+    console.log(`Specified credentials are not correct`);
   }
 });
