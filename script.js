@@ -73,10 +73,14 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
 
-const renderMovements = function (movements) {
+const renderMovements = function (movements, sorted = false) {
   containerMovements.innerHTML = "";
 
-  movements.forEach((element, index) => {
+  const movs = sorted
+    ? currentAccount.movements.slice().sort((a, b) => a - b)
+    : movements;
+
+  movs.forEach((element, index) => {
     const movType = element > 0 ? "deposit" : "withdrawal";
 
     const rowHtml = `<div class="movements__row">
@@ -237,4 +241,10 @@ btnLoan.addEventListener("click", (e) => {
   } else {
     console.log(loanAmount);
   }
+});
+
+btnSort.addEventListener("click", () => {
+  currentAccount.sorted = !currentAccount.sorted || false;
+
+  renderMovements(currentAccount.movements, currentAccount.sorted);
 });
