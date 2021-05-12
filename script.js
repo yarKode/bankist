@@ -198,6 +198,8 @@ btnTransfer.addEventListener("click", (e) => {
   e.preventDefault();
 
   const amount = Number(inputTransferAmount.value.trim());
+
+  const transferDate = new Date().toISOString();
   const recepient = inputTransferTo.value.trim().toLowerCase();
   if (
     recepient &&
@@ -209,7 +211,9 @@ btnTransfer.addEventListener("click", (e) => {
 
     if (accReceiver) {
       accReceiver.movements.push(amount);
+      accReceiver.movementsDates.push(transferDate);
       currentAccount.movements.push(-amount);
+      currentAccount.movementsDates.push(transferDate);
       updateUI(currentAccount);
 
       inputTransferTo.innerText = "";
@@ -253,11 +257,14 @@ btnClose.addEventListener("click", (e) => {
 btnLoan.addEventListener("click", (e) => {
   e.preventDefault();
   const loanAmount = Number(inputLoanAmount.value.trim());
+
+  const loanDate = new Date().toISOString();
   if (
     loanAmount > 0 &&
     currentAccount.movements.some((mov) => mov / 0.1 > loanAmount)
   ) {
     currentAccount.movements.push(loanAmount);
+    currentAccount.movementsDates.push(loanDate);
     inputLoanAmount.value = "";
     inputLoanAmount.blur();
     updateUI(currentAccount);
