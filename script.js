@@ -85,18 +85,29 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
 
-const renderMovements = function (movements, sorted = false) {
+const renderMovements = function (acc, sorted = false) {
+  renderDate(now);
+
   containerMovements.innerHTML = "";
 
   const movs = sorted
     ? currentAccount.movements.slice().sort((a, b) => a - b)
-    : movements;
+    : acc.movements;
+
+  console.log(movs, sorted);
 
   movs.forEach((element, index) => {
     const movType = element > 0 ? "deposit" : "withdrawal";
 
+    const movDate = new Date(acc.movementsDates[index]);
+
+    console.log(movDate);
+
+    const dateString = transformDate(movDate);
+
     const rowHtml = `<div class="movements__row">
       <div class="movements__type movements__type--${movType}">${index} ${movType}</div>
+      <div class="movements__date">${dateString}</div>
       <div class="movements__value">${element.toFixed(2)}€</div>
     </div>`;
 
@@ -145,7 +156,7 @@ const calcAndDisplayInterest = ({ movements: arr, interestRate }) => {
 
 function updateUI(acc) {
   if (acc) {
-    renderMovements(acc.movements);
+    renderMovements(acc);
     calcAndDisplayBalance(acc);
     calcAndDisplaySum(acc.movements);
     calcAndDisplayOut(acc.movements);
@@ -258,5 +269,26 @@ btnLoan.addEventListener("click", (e) => {
 btnSort.addEventListener("click", () => {
   currentAccount.sorted = !currentAccount.sorted || false;
 
-  renderMovements(currentAccount.movements, currentAccount.sorted);
+  renderMovements(currentAccount, currentAccount.sorted);
 });
+
+const now = new Date();
+
+function renderDate(date) {
+  const transformedDate = transformDate(date, true);
+  labelDate.innerText = `${transformedDate}`;
+}
+
+function transformDate(date, withHour) {
+  const day = date.getDate().toString().padStart(2, 0);
+  const month = date.getMonth().toString().padStart(2, 0);
+  const year = date.getFullYear();
+  const hour = date.getHours().toString().padStart(2, 0);
+  const minute = date.getMinutes().toString().padStart(2, 0);
+
+  const dateString = withHour
+    ? `${day}/${month}/${year}, ${hour}:${minute}`
+    : `${day}/${month}/${year}`;
+
+  return dateString;
+}
