@@ -97,7 +97,7 @@ const renderMovements = function (movements, sorted = false) {
 
     const rowHtml = `<div class="movements__row">
       <div class="movements__type movements__type--${movType}">${index} ${movType}</div>
-      <div class="movements__value">${element}€</div>
+      <div class="movements__value">${element.toFixed(2)}€</div>
     </div>`;
 
     containerMovements.insertAdjacentHTML("afterbegin", rowHtml);
@@ -116,21 +116,21 @@ console.log(accounts);
 
 const calcAndDisplayBalance = function (acc) {
   const balance = acc.movements.reduce((acc, el) => acc + el, 0);
-  acc.balance = balance;
+  acc.balance = +balance;
 
-  labelBalance.innerText = `${balance} €`;
+  labelBalance.innerText = `${balance.toFixed(2)} €`;
 };
 
 const calcAndDisplaySum = function (arr) {
   const income = arr.filter((el) => el > 0).reduce((acc, el) => acc + el, 0);
 
-  labelSumIn.innerText = `${income} €`;
+  labelSumIn.innerText = `${income.toFixed(2)} €`;
 };
 
 const calcAndDisplayOut = function (arr) {
   const outcome = arr.filter((el) => el < 0).reduce((acc, el) => acc + el, 0);
 
-  labelSumOut.innerText = `${Math.abs(outcome)} €`;
+  labelSumOut.innerText = `${outcome.toFixed(2)} €`;
 };
 
 const calcAndDisplayInterest = ({ movements: arr, interestRate }) => {
@@ -140,7 +140,7 @@ const calcAndDisplayInterest = ({ movements: arr, interestRate }) => {
     .filter((el) => el > 1)
     .reduce((acc, el) => acc + el, 0);
   console.log(interest);
-  labelSumInterest.innerText = `${interest} €`;
+  labelSumInterest.innerText = `${interest.toFixed(2)} €`;
 };
 
 function updateUI(acc) {
