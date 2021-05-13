@@ -1,7 +1,3 @@
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// BANKIST APP
-
 // Data
 const account1 = {
   owner: "Jonas Schmedtmann",
@@ -17,7 +13,7 @@ const account1 = {
     "2020-05-08T14:11:59.604Z",
     "2020-05-27T17:01:17.194Z",
     "2020-07-11T23:36:17.929Z",
-    "2020-07-12T10:51:36.790Z",
+    "2021-05-12T10:51:36.790Z",
   ],
   currency: "EUR",
   locale: "pt-PT", // de-DE
@@ -37,7 +33,7 @@ const account2 = {
     "2020-02-05T16:33:06.386Z",
     "2020-04-10T14:43:26.374Z",
     "2020-06-25T18:49:59.371Z",
-    "2020-07-26T12:01:20.894Z",
+    "2021-05-12T12:01:20.894Z",
   ],
   currency: "USD",
   locale: "en-US",
@@ -71,10 +67,6 @@ const inputLoanAmount = document.querySelector(".form__input--loan-amount");
 const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
-
 const currencies = new Map([
   ["USD", "United States dollar"],
   ["EUR", "Euro"],
@@ -82,8 +74,6 @@ const currencies = new Map([
 ]);
 
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-
-/////////////////////////////////////////////////
 
 const renderMovements = function (acc, sorted = false) {
   renderDate(now);
@@ -101,9 +91,9 @@ const renderMovements = function (acc, sorted = false) {
 
     const movDate = new Date(acc.movementsDates[index]);
 
-    console.log(movDate);
+    console.log(calcDaysDifference(movDate, now));
 
-    const dateString = transformDate(movDate);
+    const dateString = transferDateString(movDate, now);
 
     const rowHtml = `<div class="movements__row">
       <div class="movements__type movements__type--${movType}">${index} ${movType}</div>
@@ -114,6 +104,18 @@ const renderMovements = function (acc, sorted = false) {
     containerMovements.insertAdjacentHTML("afterbegin", rowHtml);
   });
 };
+
+function calcDaysDifference(date1, date2) {
+  return Math.round(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
+}
+
+function transferDateString(date1, date2) {
+  const difference = calcDaysDifference(date1, date2);
+
+  if (difference === 0) return "Today";
+  if (difference <= 7) return `${difference} days ago`;
+  return transformDate(date1);
+}
 
 function createUsername(arr) {
   arr.forEach((el) => {
