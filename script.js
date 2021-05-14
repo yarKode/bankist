@@ -86,26 +86,37 @@ const renderMovements = function (acc, sorted = false) {
     ? currentAccount.movements.slice().sort((a, b) => a - b)
     : acc.movements;
 
-  console.log(movs, sorted);
-
   movs.forEach((element, index) => {
     const movType = element > 0 ? "deposit" : "withdrawal";
 
     const movDate = new Date(acc.movementsDates[index]);
 
-    console.log(calcDaysDifference(movDate, now));
-
     const dateString = transferDateString(movDate, now);
+
+    const currencyString = formatCurrencyString(
+      element,
+      acc.locale,
+      acc.currency
+    );
 
     const rowHtml = `<div class="movements__row">
       <div class="movements__type movements__type--${movType}">${index} ${movType}</div>
       <div class="movements__date">${dateString}</div>
-      <div class="movements__value">${element.toFixed(2)}€</div>
+      <div class="movements__value">${currencyString}</div>
     </div>`;
 
     containerMovements.insertAdjacentHTML("afterbegin", rowHtml);
   });
 };
+
+function formatCurrencyString(amount, locale, currency) {
+  const amountDisplayOptions = {
+    style: "currency",
+    currency: currency,
+  };
+
+  return new Intl.NumberFormat(locale, amountDisplayOptions).format(amount);
+}
 
 //Calculate days difference
 function calcDaysDifference(date1, date2) {
@@ -138,19 +149,31 @@ const calcAndDisplayBalance = function (acc) {
   const balance = acc.movements.reduce((acc, el) => acc + el, 0);
   acc.balance = +balance;
 
-  labelBalance.innerText = `${balance.toFixed(2)} €`;
+  labelBalance.innerText = formatCurrencyString(
+    balance,
+    acc.locale,
+    acc.currency
+  );
 };
 
 const calcAndDisplaySum = function (arr) {
   const income = arr.filter((el) => el > 0).reduce((acc, el) => acc + el, 0);
 
-  labelSumIn.innerText = `${income.toFixed(2)} €`;
+  labelSumIn.innerText = formatCurrencyString(
+    income,
+    currentAccount.locale,
+    currentAccount.currency
+  );
 };
 
 const calcAndDisplayOut = function (arr) {
   const outcome = arr.filter((el) => el < 0).reduce((acc, el) => acc + el, 0);
 
-  labelSumOut.innerText = `${outcome.toFixed(2)} €`;
+  labelSumOut.innerText = formatCurrencyString(
+    outcome,
+    currentAccount.locale,
+    currentAccount.currency
+  );
 };
 
 const calcAndDisplayInterest = ({ movements: arr, interestRate }) => {
@@ -159,8 +182,11 @@ const calcAndDisplayInterest = ({ movements: arr, interestRate }) => {
     .map((el) => (el * interestRate) / 100)
     .filter((el) => el > 1)
     .reduce((acc, el) => acc + el, 0);
-  console.log(interest);
-  labelSumInterest.innerText = `${interest.toFixed(2)} €`;
+  labelSumInterest.innerText = formatCurrencyString(
+    interest,
+    currentAccount.locale,
+    currentAccount.currency
+  );
 };
 
 //Function used to update UI when required (for example after user logged in)
