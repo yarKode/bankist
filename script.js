@@ -75,6 +75,8 @@ const currencies = new Map([
 
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
+//Render a List with Transactions
+
 const renderMovements = function (acc, sorted = false) {
   renderDate(now);
 
@@ -105,10 +107,12 @@ const renderMovements = function (acc, sorted = false) {
   });
 };
 
+//Calculate days difference
 function calcDaysDifference(date1, date2) {
   return Math.round(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
 }
 
+//Format days difference to String to display inside client area
 function transferDateString(date1, date2) {
   const difference = calcDaysDifference(date1, date2);
 
@@ -117,6 +121,7 @@ function transferDateString(date1, date2) {
   return transformDate(date1);
 }
 
+//Create username for each user and set it inside user's object
 function createUsername(arr) {
   arr.forEach((el) => {
     const toLowerArr = el.owner.toLowerCase().split(" ");
@@ -124,9 +129,11 @@ function createUsername(arr) {
   });
 }
 
-createUsername(accounts);
-console.log(accounts);
+const now = new Date();
 
+createUsername(accounts);
+
+//FUNCTIONS TO CALCULATE AND DISPLAY 'BALANCE', 'IN', 'OUT' AND 'INTEREST'
 const calcAndDisplayBalance = function (acc) {
   const balance = acc.movements.reduce((acc, el) => acc + el, 0);
   acc.balance = +balance;
@@ -156,6 +163,7 @@ const calcAndDisplayInterest = ({ movements: arr, interestRate }) => {
   labelSumInterest.innerText = `${interest.toFixed(2)} €`;
 };
 
+//Function used to update UI when required (for example after user logged in)
 function updateUI(acc) {
   if (acc) {
     renderMovements(acc);
@@ -171,6 +179,7 @@ function updateUI(acc) {
 }
 let currentAccount;
 
+//Evet listener on Login button to perform login function
 btnLogin.addEventListener("click", (e) => {
   e.preventDefault();
 
@@ -281,23 +290,21 @@ btnSort.addEventListener("click", () => {
   renderMovements(currentAccount, currentAccount.sorted);
 });
 
-const now = new Date();
-
 function renderDate(date) {
   const transformedDate = transformDate(date, true);
   labelDate.innerText = `${transformedDate}`;
 }
 
 function transformDate(date, withHour) {
-  const day = date.getDate().toString().padStart(2, 0);
-  const month = date.getMonth().toString().padStart(2, 0);
-  const year = date.getFullYear();
-  const hour = date.getHours().toString().padStart(2, 0);
-  const minute = date.getMinutes().toString().padStart(2, 0);
+  let dateOptions = {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: withHour && "2-digit",
+    minute: withHour && "2-digit",
+  };
 
-  const dateString = withHour
-    ? `${day}/${month}/${year}, ${hour}:${minute}`
-    : `${day}/${month}/${year}`;
-
-  return dateString;
+  return new Intl.DateTimeFormat(currentAccount.locale, dateOptions).format(
+    date
+  );
 }
