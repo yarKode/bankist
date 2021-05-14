@@ -103,7 +103,7 @@ const renderMovements = function (acc, sorted = false) {
       <div class="movements__type movements__type--${movType}">${index} ${movType}</div>
       <div class="movements__date">${dateString}</div>
       <div class="movements__value">${currencyString}</div>
-    </div>`;
+      </div>`;
 
     containerMovements.insertAdjacentHTML("afterbegin", rowHtml);
   });
@@ -141,6 +141,7 @@ function createUsername(arr) {
 }
 
 const now = new Date();
+let currentAccount, timer;
 
 createUsername(accounts);
 
@@ -203,7 +204,6 @@ function updateUI(acc) {
     containerMovements.innerHtml = "";
   }
 }
-let currentAccount;
 
 //Evet listener on Login button to perform login function
 btnLogin.addEventListener("click", (e) => {
@@ -226,6 +226,7 @@ btnLogin.addEventListener("click", (e) => {
     labelWelcome.innerText = `Welcome back, ${
       currentAccount.owner.split(" ")[0]
     }`;
+    restartTimer();
   } else {
     labelWelcome.innerText = "Wrong credentials";
   }
@@ -238,6 +239,9 @@ btnTransfer.addEventListener("click", (e) => {
 
   const transferDate = new Date().toISOString();
   const recepient = inputTransferTo.value.trim().toLowerCase();
+
+  restartTimer();
+
   if (
     recepient &&
     amount > 0 &&
@@ -295,6 +299,8 @@ btnLoan.addEventListener("click", (e) => {
   e.preventDefault();
   const loanAmount = Number(inputLoanAmount.value.trim());
 
+  restartTimer();
+
   const loanDate = new Date().toISOString();
   if (
     loanAmount > 0 &&
@@ -333,4 +339,41 @@ function transformDate(date, withHour) {
   return new Intl.DateTimeFormat(currentAccount.locale, dateOptions).format(
     date
   );
+}
+
+function autoLogOutTimer() {
+  let time = 120; //sec
+
+  function secondsToTimeFormar(sec) {
+    const minutes = String(Math.trunc(sec / 60)).padStart(2, 0);
+    const seconds = String(sec % 60).padStart(2, 0);
+
+    return `${minutes}:${seconds}`;
+  }
+
+  function timeChecker() {
+    if (time === 0) {
+      clearInterval(timer);
+      logout();
+    }
+
+    labelTimer.innerText = secondsToTimeFormar(time);
+    time--;
+  }
+
+  timeChecker();
+
+  timer = setInterval(() => {
+    timeChecker();
+  }, 1000);
+}
+
+function logout() {
+  currentAccount = null;
+  updateUI();
+}
+
+function restartTimer() {
+  timer && clearInterval(timer);
+  autoLogOutTimer();
 }
